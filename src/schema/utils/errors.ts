@@ -10,4 +10,15 @@ type InvalidPropErrorBlueprint = ErrorBlueprint<{
   }
 }>
 
-export type SharedSchemaErrorBlueprint = InvalidPropErrorBlueprint
+export type SharedSchemaErrorBlueprint =
+  | InvalidPropErrorBlueprint
+  | ErrorBlueprint<{
+      code: 'schema.lazy.invalidResolution'
+      hasPath: true
+      payload: { received: unknown }
+    }>
+  | ErrorBlueprint<{
+      code: 'schema.dto.unknownReference'
+      hasPath: false
+      payload: { ref: string }
+    }>

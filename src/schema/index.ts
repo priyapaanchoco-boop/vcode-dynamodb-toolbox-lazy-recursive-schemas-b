@@ -3,6 +3,7 @@ import { anyOf } from './anyOf/index.js'
 import { binary } from './binary/index.js'
 import { boolean } from './boolean/index.js'
 import { item } from './item/index.js'
+import { lazy } from './lazy/index.js'
 import { list } from './list/index.js'
 import { map } from './map/index.js'
 import { nul } from './null/index.js'
@@ -10,6 +11,8 @@ import { number } from './number/index.js'
 import { record } from './record/index.js'
 import { set } from './set/index.js'
 import { string } from './string/index.js'
+
+export * from './lazy/index.js'
 
 export * from './types/index.js'
 
@@ -30,6 +33,7 @@ export * from './item/index.js'
 export { SchemaAction } from './schema.js'
 
 export const schema: {
+  lazy: typeof lazy
   any: typeof any
   nul: typeof nul
   boolean: typeof boolean
@@ -43,6 +47,7 @@ export const schema: {
   anyOf: typeof anyOf
   item: typeof item
 } = {
+  lazy,
   any,
   nul,
   boolean,

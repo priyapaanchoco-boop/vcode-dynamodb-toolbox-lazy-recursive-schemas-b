@@ -4,22 +4,26 @@ import { list } from '~/schema/list/index.js'
 import type { ListElementSchema } from '~/schema/list/types.js'
 
 import { fromSchemaDTO } from './attribute.js'
+import type { FromSchemaDTOContext } from './context.js'
 
 type ListSchemaDTO = Extract<ISchemaDTO, { type: 'list' }>
 
 /**
  * @debt feature "handle defaults, links & validators"
  */
-export const fromListSchemaDTO = ({
-  keyDefault,
-  putDefault,
-  updateDefault,
-  keyLink,
-  putLink,
-  updateLink,
-  elements,
-  ...props
-}: ListSchemaDTO): ListSchema => {
+export const fromListSchemaDTO = (
+  {
+    keyDefault,
+    putDefault,
+    updateDefault,
+    keyLink,
+    putLink,
+    updateLink,
+    elements,
+    ...props
+  }: ListSchemaDTO,
+  context?: FromSchemaDTOContext
+): ListSchema => {
   keyDefault
   putDefault
   updateDefault
@@ -27,5 +31,5 @@ export const fromListSchemaDTO = ({
   putLink
   updateLink
 
-  return list(fromSchemaDTO(elements) as ListElementSchema, props)
+  return list(fromSchemaDTO(elements, context) as ListElementSchema, props)
 }

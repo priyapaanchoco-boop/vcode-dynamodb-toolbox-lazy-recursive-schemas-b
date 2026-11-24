@@ -769,6 +769,16 @@
         "types": "./dist/cjs/types/index.d.ts",
         "default": "./dist/cjs/types/index.js"
       }
+    },
+    "./schema/lazy": {
+      "import": {
+        "types": "./dist/esm/schema/lazy/index.d.ts",
+        "default": "./dist/esm/schema/lazy/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/schema/lazy/index.d.ts",
+        "default": "./dist/cjs/schema/lazy/index.js"
+      }
     }
   },
   "dependencies": {

@@ -1,5 +1,6 @@
-import type { z } from 'zod'
+import { z } from 'zod'
 
+import type { LazySchema } from '~/schema/index.js'
 import type {
   AnyOfSchema,
   AnySchema,
@@ -15,7 +16,9 @@ import type {
   SetSchema,
   StringSchema
 } from '~/schema/index.js'
+import { resolveLazySchema } from '~/schema/lazy/schema.js'
 
+import type { DeferredZodFormatter } from '../deferred.js'
 import type { AnyZodFormatter } from './any.js'
 import { anyZodFormatter } from './any.js'
 import type { AnyOfZodFormatter } from './anyOf.js'
@@ -57,6 +60,7 @@ export type SchemaZodFormatter<
 > = Schema extends SCHEMA
   ? z.ZodTypeAny
   :
+      | (SCHEMA extends LazySchema ? DeferredZodFormatter<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends AnySchema ? AnyZodFormatter<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends NullSchema ? NullZodFormatter<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends BooleanSchema ? BooleanZodFormatter<SCHEMA, OPTIONS> : never)
@@ -76,6 +80,10 @@ export const schemaZodFormatter = <SCHEMA extends Schema, OPTIONS extends ZodFor
   type ZOD_FORMATTER = SchemaZodFormatter<SCHEMA, OPTIONS>
 
   switch (schema.type) {
+    case 'lazy':
+      return z.lazy(() =>
+        schemaZodFormatter(resolveLazySchema(schema), options)
+      ) as unknown as ZOD_FORMATTER
     case 'any':
       return anyZodFormatter(schema, options) as ZOD_FORMATTER
     case 'null':

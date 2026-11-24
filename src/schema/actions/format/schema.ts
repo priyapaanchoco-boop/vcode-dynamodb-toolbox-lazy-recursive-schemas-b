@@ -1,10 +1,12 @@
 import { DynamoDBToolboxError } from '~/errors/index.js'
 import { formatArrayPath } from '~/schema/actions/utils/formatArrayPath.js'
 import type { Schema, SchemaRequiredProp } from '~/schema/index.js'
+import { resolveLazySchema } from '~/schema/lazy/schema.js'
 
 import { anySchemaFormatter } from './any.js'
 import { anyOfSchemaFormatter } from './anyOf.js'
 import type { FormatterReturn, FormatterYield } from './formatter.js'
+import { itemFormatter } from './item.js'
 import { listSchemaFormatter } from './list.js'
 import { mapSchemaFormatter } from './map.js'
 import type { FormatAttrValueOptions } from './options.js'
@@ -28,6 +30,13 @@ export function* schemaFormatter<
   FormatterYield<Schema, FormatAttrValueOptions<Schema>>,
   FormatterReturn<Schema, FormatAttrValueOptions<Schema>>
 > {
+  if (schema.type === 'lazy')
+    return yield* schemaFormatter(
+      resolveLazySchema(schema),
+      rawValue,
+      options as unknown as FormatAttrValueOptions<Schema>
+    )
+
   const { format = true, transform = true, valuePath } = options
 
   if (rawValue === undefined) {
@@ -55,6 +64,8 @@ export function* schemaFormatter<
   }
 
   switch (schema.type) {
+    case 'item':
+      return yield* itemFormatter(schema, rawValue, options)
     case 'any':
       return yield* anySchemaFormatter(schema, rawValue, options)
     case 'null':

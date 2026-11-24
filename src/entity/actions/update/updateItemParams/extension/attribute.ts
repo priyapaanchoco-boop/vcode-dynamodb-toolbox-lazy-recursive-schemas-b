@@ -6,6 +6,7 @@ import type {
   Schema,
   SchemaUnextendedValue
 } from '~/schema/index.js'
+import { resolveLazySchema } from '~/schema/lazy/schema.js'
 
 import { isGetting, isRemoval } from '../../symbols/index.js'
 import type { UpdateItemInputExtension } from '../../types.js'
@@ -21,6 +22,8 @@ export const parseUpdateExtension: ExtensionParser<UpdateItemInputExtension> = (
   input: unknown,
   options: ExtensionParserOptions = {}
 ) => {
+  if (schema.type === 'lazy') return parseUpdateExtension(resolveLazySchema(schema), input, options)
+
   const { transform = true, valuePath } = options
 
   if (isRemoval(input)) {

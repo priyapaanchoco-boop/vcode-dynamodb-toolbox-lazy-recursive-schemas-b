@@ -26,6 +26,7 @@ import type {
   StringSchema,
   StringToEscape
 } from '~/schema/index.js'
+import type { LazySchema } from '~/schema/lazy/index.js'
 import type { Extends, If } from '~/types/index.js'
 
 export type AnySchemaCondition<
@@ -33,8 +34,13 @@ export type AnySchemaCondition<
   ATTR_PATH extends string,
   ALL_PATHS extends string
 > =
-  | AttrCondition<ATTR_PATH, Exclude<Schema, AnySchema>, ALL_PATHS, ResolveAnySchema<SCHEMA>>
-  | AttrCondition<`${ATTR_PATH}${string}`, Exclude<Schema, AnySchema>, ALL_PATHS>
+  | AttrCondition<
+      ATTR_PATH,
+      Exclude<Schema, AnySchema | LazySchema>,
+      ALL_PATHS,
+      ResolveAnySchema<SCHEMA>
+    >
+  | AttrCondition<`${ATTR_PATH}${string}`, Exclude<Schema, AnySchema | LazySchema>, ALL_PATHS>
 
 export type ConditionType = 'S' | 'SS' | 'N' | 'NS' | 'B' | 'BS' | 'BOOL' | 'NULL' | 'L' | 'M'
 
@@ -44,6 +50,13 @@ export type AttrCondition<
   ALL_PATHS extends string,
   CUSTOM_VALUE = never
 > =
+  | (SCHEMA extends LazySchema
+      ? AttrCondition<
+          ATTR_PATH | `${ATTR_PATH}${string}`,
+          PrimitiveSchema | SetSchema | ListSchema | MapSchema | RecordSchema,
+          ALL_PATHS
+        >
+      : never)
   | (SCHEMA extends AnySchema ? AnySchemaCondition<SCHEMA, ATTR_PATH, ALL_PATHS> : never)
   | (SCHEMA extends NullSchema ? NullSchemaCondition<ATTR_PATH> : never)
   | (SCHEMA extends BooleanSchema

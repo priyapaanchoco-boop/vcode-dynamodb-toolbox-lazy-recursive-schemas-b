@@ -28,6 +28,7 @@ import type {
 import type { Transformer, TypeModifier } from '~/transformers/index.js'
 import type { Extends, If, Not, Optional, Overwrite, SelectKeys } from '~/types/index.js'
 
+import type { LazySchema, ResolveLazySchema } from '../lazy/index.js'
 import type { SchemaExtendedWriteValue, WriteValueOptions } from './options.js'
 
 export type TransformedValue<
@@ -87,6 +88,11 @@ type SchemaTransformedValue<
 > = Schema extends SCHEMA
   ? unknown
   :
+      | (SCHEMA extends LazySchema
+          ? LazySchema extends SCHEMA
+            ? unknown
+            : TransformedValue<ResolveLazySchema<SCHEMA>, OPTIONS>
+          : never)
       | (SCHEMA extends AnySchema ? AnySchemaTransformedValue<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends PrimitiveSchema ? PrimitiveSchemaTransformedValue<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends SetSchema ? SetSchemaTransformedValue<SCHEMA, OPTIONS> : never)

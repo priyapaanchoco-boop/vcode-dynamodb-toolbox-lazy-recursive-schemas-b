@@ -1,3 +1,4 @@
+import type { LazySchema } from '../lazy/index.js'
 import type { MapSchema } from '../map/schema.js'
 import type { StringSchema } from '../string/schema.js'
 import type { Always, AtLeastOnce, Schema, SchemaProps } from '../types/index.js'
@@ -6,6 +7,11 @@ import type { AnyOfSchema } from './schema.js'
 type ElementDiscriminator<ELEMENT extends Schema> = Schema extends ELEMENT
   ? string
   :
+      | (ELEMENT extends LazySchema
+          ? LazySchema extends ELEMENT
+            ? string
+            : ElementDiscriminator<ReturnType<ELEMENT['resolve']>>
+          : never)
       | (ELEMENT extends AnyOfSchema ? Discriminator<ELEMENT['elements']> : never)
       | (ELEMENT extends MapSchema
           ? {

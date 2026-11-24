@@ -22,6 +22,7 @@ import type {
 } from '~/schema/index.js'
 import type { Extends, If, Not, OmitKeys, Optional, Overwrite } from '~/types/index.js'
 
+import type { LazySchema, ResolveLazySchema } from '../lazy/index.js'
 import type { ReadValueOptions } from './options.js'
 import type { ChildPaths, MatchKeys } from './pathUtils.js'
 import type { Paths } from './paths.js'
@@ -81,6 +82,14 @@ type SchemaFormattedValue<
 > = Schema extends SCHEMA
   ? unknown
   :
+      | (SCHEMA extends LazySchema
+          ? LazySchema extends SCHEMA
+            ? unknown
+            : FormattedValue<
+                ResolveLazySchema<SCHEMA>,
+                Extract<OPTIONS, ReadValueOptions<ResolveLazySchema<SCHEMA>>>
+              >
+          : never)
       | (SCHEMA extends AnySchema ? AnySchemaFormattedValue<SCHEMA> : never)
       | (SCHEMA extends NullSchema
           ? If<MustBeDefined<SCHEMA>, never, undefined> | ResolvedNullSchema

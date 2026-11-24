@@ -1,5 +1,6 @@
-import type { z } from 'zod'
+import { z } from 'zod'
 
+import type { LazySchema } from '~/schema/index.js'
 import type {
   AnyOfSchema,
   AnySchema,
@@ -15,7 +16,9 @@ import type {
   SetSchema,
   StringSchema
 } from '~/schema/index.js'
+import { resolveLazySchema } from '~/schema/lazy/schema.js'
 
+import type { DeferredZodParser } from '../deferred.js'
 import type { AnyZodParser } from './any.js'
 import { anyZodParser } from './any.js'
 import type { AnyOfZodParser } from './anyOf.js'
@@ -57,6 +60,7 @@ export type SchemaZodParser<
 > = Schema extends SCHEMA
   ? z.ZodTypeAny
   :
+      | (SCHEMA extends LazySchema ? DeferredZodParser<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends AnySchema ? AnyZodParser<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends NullSchema ? NullZodParser<SCHEMA, OPTIONS> : never)
       | (SCHEMA extends BooleanSchema ? BooleanZodParser<SCHEMA, OPTIONS> : never)
@@ -76,6 +80,10 @@ export const schemaZodParser = <SCHEMA extends Schema, OPTIONS extends ZodParser
   type ZOD_PARSER = SchemaZodParser<SCHEMA, OPTIONS>
 
   switch (schema.type) {
+    case 'lazy':
+      return z.lazy(() =>
+        schemaZodParser(resolveLazySchema(schema), options)
+      ) as unknown as ZOD_PARSER
     case 'any':
       return anyZodParser(schema, options) as ZOD_PARSER
     case 'null':

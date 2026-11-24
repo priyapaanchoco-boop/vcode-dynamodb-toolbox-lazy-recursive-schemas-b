@@ -1,6 +1,7 @@
 import { DynamoDBToolboxError } from '~/errors/index.js'
 import { isArray } from '~/utils/validation/isArray.js'
 
+import { resolveLazySchema } from '../lazy/schema.js'
 import type { Schema } from '../types/index.js'
 import { checkSchemaProps } from '../utils/checkSchemaProps.js'
 import { hasDefinedDefault } from '../utils/hasDefinedDefault.js'
@@ -151,6 +152,8 @@ export class AnyOfSchema<
 
 const getDiscriminators = (schema: Schema): Record<string, string> | undefined => {
   switch (schema.type) {
+    case 'lazy':
+      return getDiscriminators(resolveLazySchema(schema))
     case 'anyOf':
       return schema[$discriminators]
     case 'map': {
@@ -203,6 +206,8 @@ const intersectDiscriminators = (
 
 const getDiscriminations = (schema: Schema, discriminator: string): Record<string, Schema> => {
   switch (schema.type) {
+    case 'lazy':
+      return getDiscriminations(resolveLazySchema(schema), discriminator)
     case 'anyOf': {
       let discriminations: Record<string, Schema> = {}
 

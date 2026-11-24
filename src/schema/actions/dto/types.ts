@@ -180,25 +180,18 @@ export interface AnyOfSchemaDTO extends SchemaPropsDTO {
   discriminator?: string
 }
 
+export interface SchemaReferenceDTO extends SchemaPropsDTO {
+  $ref: string
+}
+
 export interface ItemSchemaDTO extends SchemaPropsDTO {
+  $defs?: Record<string, ISchemaDTO>
   type: 'item'
-  attributes: {
-    [name: string]:
-      | AnySchemaDTO
-      | NullSchemaDTO
-      | BooleanSchemaDTO
-      | NumberSchemaDTO
-      | StringSchemaDTO
-      | BinarySchemaDTO
-      | SetSchemaDTO
-      | ListSchemaDTO
-      | MapSchemaDTO
-      | RecordSchemaDTO
-      | AnyOfSchemaDTO
-  }
+  attributes: { [name: string]: ISchemaDTO }
 }
 
 export type ISchemaDTO =
+  | SchemaReferenceDTO
   | AnySchemaDTO
   | NullSchemaDTO
   | BooleanSchemaDTO
