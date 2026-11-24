@@ -7,7 +7,7 @@ export interface FromSchemaDTOContext {
   schemas: Map<string, Schema>
 }
 export const referenceId = (ref: string, context: FromSchemaDTOContext): string => {
-  const id = ref.startsWith('#/$defs/') ? ref.slice('#/$defs/'.length) : ''
+  const id = ref.startsWith('#/$schemaDefs/') ? ref.slice('#/$schemaDefs/'.length) : ''
   if (!Object.prototype.hasOwnProperty.call(context.definitions, id)) {
     throw new DynamoDBToolboxError('schema.dto.unknownReference', {
       message: 'Unknown schema reference: ' + ref,

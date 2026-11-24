@@ -7,7 +7,10 @@ import type { FromSchemaDTOContext } from './fromSchemaDTO/context.js'
 import { fromSchemaDTO as _fromSchemaDTO } from './fromSchemaDTO/index.js'
 
 export const fromSchemaDTO = (schemaDTO: ItemSchemaDTO): ItemSchema => {
-  const context: FromSchemaDTOContext = { definitions: schemaDTO.$defs ?? {}, schemas: new Map() }
+  const context: FromSchemaDTOContext = {
+    definitions: schemaDTO.$schemaDefs ?? {},
+    schemas: new Map()
+  }
   validateReferences(schemaDTO, context)
   Object.values(context.definitions).forEach(dto => validateReferences(dto, context))
   return item(

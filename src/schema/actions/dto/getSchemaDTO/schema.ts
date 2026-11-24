@@ -18,7 +18,7 @@ export const getSchemaDTO = (schema: Schema, context?: SchemaDTOContext): ISchem
     const rootContext = createSchemaDTOContext()
     const dto = getSchemaDTO(schema, rootContext)
     if ('type' in dto && dto.type === 'item' && Object.keys(rootContext.definitions).length > 0) {
-      dto.$defs = rootContext.definitions
+      dto.$schemaDefs = rootContext.definitions
     }
     return dto
   }
@@ -37,7 +37,7 @@ export const getSchemaDTO = (schema: Schema, context?: SchemaDTOContext): ISchem
       }
       const { required, hidden, key, savedAs } = schema.props
       return {
-        $ref: '#/$defs/' + id,
+        $ref: '#/$schemaDefs/' + id,
         ...(required !== undefined ? { required } : {}),
         ...(hidden !== undefined ? { hidden } : {}),
         ...(key !== undefined ? { key } : {}),

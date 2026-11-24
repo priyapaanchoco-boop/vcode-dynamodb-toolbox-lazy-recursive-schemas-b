@@ -159,8 +159,9 @@ describe('lazy schemas', () => {
   it('round-trips recursive DTOs through JSON with untyped references and root definitions', () => {
     const schema = item({ comment: lazy(() => recursiveComment()) })
     const dto = new SchemaDTO(schema).toJSON()
-    expect(dto.attributes.comment).toEqual({ $ref: '#/$defs/schema0' })
-    expect(dto.$defs).toBeDefined()
+    expect(dto.attributes.comment).toEqual({ $ref: '#/$schemaDefs/schema0' })
+    expect(dto.$schemaDefs).toBeDefined()
+    expect(dto).not.toHaveProperty('$defs')
     expect(JSON.stringify(dto)).not.toContain('"type":"lazy"')
     const rebuilt = fromSchemaDTO(JSON.parse(JSON.stringify(dto)) as ItemSchemaDTO)
     rebuilt.check()
@@ -184,7 +185,7 @@ describe('lazy schemas', () => {
       })
     })
     const dto = new SchemaDTO(schema).toJSON()
-    expect(Object.keys(dto.$defs ?? {})).toHaveLength(1)
+    expect(Object.keys(dto.$schemaDefs ?? {})).toHaveLength(1)
     const rebuilt = fromSchemaDTO(JSON.parse(JSON.stringify(dto)) as ItemSchemaDTO)
     const input = { nested: { rows: [{ a: 'hello', b: { text: 'world' } }] } }
     expect(new Parser(rebuilt).parse(input)).toEqual(input)
@@ -195,7 +196,7 @@ describe('lazy schemas', () => {
     const right: Schema = map({ left: lazy((): Schema => left).optional() })
     const schema = item({ root: lazy(() => left).savedAs('r') })
     const dto = new SchemaDTO(schema).toJSON()
-    expect(dto.attributes.root).toEqual({ $ref: '#/$defs/schema0', savedAs: 'r' })
+    expect(dto.attributes.root).toEqual({ $ref: '#/$schemaDefs/schema0', savedAs: 'r' })
     const rebuilt = fromSchemaDTO(JSON.parse(JSON.stringify(dto)) as ItemSchemaDTO)
     rebuilt.check()
     expect(new Parser(rebuilt).parse({ root: { right: { left: {} } } })).toEqual({
@@ -225,7 +226,7 @@ describe('lazy schemas', () => {
       attributes: {
         nested: {
           type: 'list',
-          elements: { type: 'map', attributes: { bad: { $ref: '#/$defs/missing' } } }
+          elements: { type: 'map', attributes: { bad: { $ref: '#/$schemaDefs/missing' } } }
         }
       }
     }
@@ -236,7 +237,7 @@ describe('lazy schemas', () => {
       fromSchemaDTO({
         type: 'item',
         attributes: {},
-        $defs: { unused: { $ref: '#/$defs/missing' } }
+        $schemaDefs: { unused: { $ref: '#/$schemaDefs/missing' } }
       })
     ).toThrow()
   })
@@ -245,6 +246,7 @@ describe('lazy schemas', () => {
     const schema = recursiveComment()
     const json = new JSONSchemer(schema).formattedValueSchema()
     expect(json).toHaveProperty('$defs')
+    expect(json).not.toHaveProperty('$schemaDefs')
     expect(JSON.stringify(json)).toContain('$ref')
     const zod = new ZodSchemer(schema)
     expect(zod.parser().safeParse(value).success).toBe(true)

@@ -54,8 +54,8 @@ Value types preserve recursive field types. Attribute paths expand through three
 
 ## DTO references
 
-A root item DTO stores schema definitions in `$defs`. Lazy occurrences serialize as plain reference objects, for example `{ $ref: '#/$defs/schema0' }`, with no `type` property. Occurrence overrides are stored alongside `$ref`. References work within maps, lists, records, unions, and other definitions.
+A root item DTO stores schema definitions in `$schemaDefs`. Lazy occurrences serialize as plain reference objects, for example `{ $ref: '#/$schemaDefs/schema0' }`, with no `type` property. Occurrence overrides are stored alongside `$ref`. References work within maps, lists, records, unions, and other definitions.
 
 `fromSchemaDTO` rebuilds references with a shared definitions context. Unknown references throw `schema.dto.unknownReference`, including references nested within definitions. DTOs can be serialized and restored through JSON.
 
-JSON Schema generation also emits `$defs` and `$ref`, and Zod conversion uses lazy schemas.
+JSON Schema generation uses `$defs` and `$ref`; the `$schemaDefs` name is specific to DTOs. Zod conversion uses lazy schemas.

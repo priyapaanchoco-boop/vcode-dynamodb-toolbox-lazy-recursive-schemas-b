@@ -13,7 +13,7 @@ export class SchemaDTO<SCHEMA extends ItemSchema = ItemSchema>
 
   type: ItemSchemaDTO['type']
   attributes: ItemSchemaDTO['attributes']
-  $defs?: ItemSchemaDTO['$defs']
+  $schemaDefs?: ItemSchemaDTO['$schemaDefs']
 
   constructor(schema: SCHEMA) {
     super(schema)
@@ -25,14 +25,14 @@ export class SchemaDTO<SCHEMA extends ItemSchema = ItemSchema>
         getSchemaDTO(attribute, context)
       ])
     ) as ItemSchemaDTO['attributes']
-    if (Object.keys(context.definitions).length > 0) this.$defs = context.definitions
+    if (Object.keys(context.definitions).length > 0) this.$schemaDefs = context.definitions
   }
 
   toJSON(): ItemSchemaDTO {
     return {
       type: this.type,
       attributes: this.attributes,
-      ...(this.$defs !== undefined ? { $defs: this.$defs } : {})
+      ...(this.$schemaDefs !== undefined ? { $schemaDefs: this.$schemaDefs } : {})
     }
   }
 }

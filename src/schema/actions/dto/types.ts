@@ -185,7 +185,7 @@ export interface SchemaReferenceDTO extends SchemaPropsDTO {
 }
 
 export interface ItemSchemaDTO extends SchemaPropsDTO {
-  $defs?: Record<string, ISchemaDTO>
+  $schemaDefs?: Record<string, ISchemaDTO>
   type: 'item'
   attributes: { [name: string]: ISchemaDTO }
 }
